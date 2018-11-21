@@ -1,15 +1,24 @@
 //class to map the R&M's Character API
 class Character{
-    constructor(id, name, status, species, type, gender, image, url, created){
-        this.id = id;
-        this.name = name;
-        this.status = status;
-        this.species = species;
-        this.type = type;
-        this.gender = gender;
-        this.image = image;
-        this.url = url;
-        this.created = created;
+    constructor(data){
+        // We set up a try-catch block in case something goes kaput
+        try {
+            // We detect that the parameter is an object
+            if (typeof data === 'object') {
+                // If this matches, we traverse through its properties
+                for (let prop in data) {
+                    // `this` is an object, so you can access its props using either the
+                    // brackets syntax or the dot one. The first is better for this case.
+                    this[prop] = data[prop];
+                }
+            } else {
+                // If the type doesn't match, throw an error
+                throw new Error('Missing data');
+            }
+        } catch (error) {
+            // This is string interpolation FYI
+            console.error(`Something went wrong ${error}`);
+        }
     }
     //Getters
     get id(){
@@ -71,7 +80,7 @@ class Character{
 
 //accessing the API
 var request = new XMLHttpRequest();
-request.open('GET','https://rickandmortyapi.com/api/character/?page=13',true);
+request.open('GET','https://rickandmortyapi.com/api/character/',true);
 
 //getting data from API
 request.onload = function(){
@@ -79,14 +88,14 @@ request.onload = function(){
     if(request.status >= 200 && request.status <400){
         console.log("Data count: "+data.info.count);
 
-        data.results.forEach(c => {
-            const personaje = new Character(c.id, c.name, c.status, c.species, c.type, c.gender, c.image, c.url, c.created);
+        data.results.forEach(rawCharacter => {
+            const character = new Character(rawCharacter);
 
             var image = document.createElement("img");
-            image.setAttribute("src",personaje.image);
+            image.setAttribute("src",character.image);
             image.setAttribute("height",250);
             image.setAttribute("weight",250);
-            image.setAttribute("tittle",personaje.name);
+            image.setAttribute("tittle",character.name);
 
             document.getElementById("container").append(image);
         });
@@ -97,3 +106,13 @@ request.onload = function(){
 
 //send the request
 request.send();
+
+/** 
+Futher suggestions:
+
+1) Replace XMLHttpRequest for Fetch, I think you'll learn a lot about promises by using it
+2) Create a separate class to handle the requests, as well as the rendering of the grid. Always keep in mind SRP (single responsability principle)
+3) Great work anyway! You're on the right track.
+
+PD: The API error seems to be related to the lack of an HTTP server, use the one I suggested on the email (I just tested it and it works here)
+*/
