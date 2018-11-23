@@ -78,14 +78,11 @@ class Character{
     }
 }
 
-//accessing the API
-var request = new XMLHttpRequest();
-request.open('GET','https://rickandmortyapi.com/api/character/',true);
-
-//getting data from API
-request.onload = function(){
-    var data = JSON.parse(this.response);
-    if(request.status >= 200 && request.status <400){
+fetch('https://rickandmortyapi.com/api/character/')
+    .then(function(response){
+        return response.json();
+    })
+    .then(function(data){
         console.log("Data count: "+data.info.count);
 
         data.results.forEach(rawCharacter => {
@@ -99,13 +96,7 @@ request.onload = function(){
 
             document.getElementById("container").append(image);
         });
-    } else {
-        console.log('error!');
-    }
-}
-
-//send the request
-request.send();
+    });
 
 /** 
 Futher suggestions:
