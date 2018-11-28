@@ -1,4 +1,4 @@
-//class to map the R&M's Character API
+//class to map the R&M's Character API.
 class Character{
     constructor(data){
         // We set up a try-catch block in case something goes kaput
@@ -78,32 +78,71 @@ class Character{
     }
 }
 
-fetch('https://rickandmortyapi.com/api/character/')
-    .then(function(response){
-        return response.json();
-    })
-    .then(function(data){
-        console.log("Data count: "+data.info.count);
+//class to map the image grid properties.
+class ImageGrid{
+    constructor(image,height,weight,tittle){
+        this.image=image;
+        this.height=height;
+        this.weight=weight;
+        this.tittle=tittle;
+    }
+    get image(){
+        return this._image;
+    }
+    get height(){
+        return this._height;
+    }
+    get weight(){
+        return this._weight;
+    }
+    get tittle(){
+        return this._tittle;
+    }
+    set image(value){
+        this._image=value;
+    }
+    set height(value){
+        this._height=value;
+    }
+    set weight(value){
+        this._weight=value;
+    }
+    set tittle(value){
+        this._tittle=value;
+    }
+}
 
-        data.results.forEach(rawCharacter => {
-            const character = new Character(rawCharacter);
+//class to handle the API's request.
+class Request{
+    constructor(url){
+        this.url=url;
+    }
+    get url(){
+        return this._url;
+    }
+    set url(value){
+        this._url=value;
+    }
+    handleAPI(){
+        fetch(this._url)
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(data){
+                data.results.forEach(rawCharacter => {
+                    const character = new Character(rawCharacter);
+                    const imageGrid = new ImageGrid(character.image,250,250,character.name);
+        
+                    var image = document.createElement("img");
+                    image.setAttribute("src",imageGrid.image);
+                    image.setAttribute("height",imageGrid.height);
+                    image.setAttribute("weight",imageGrid.weight);
+                    image.setAttribute("tittle",imageGrid.name);
+        
+                    document.getElementById("container").append(image);
+                });
+            });
+    }
+}
 
-            var image = document.createElement("img");
-            image.setAttribute("src",character.image);
-            image.setAttribute("height",250);
-            image.setAttribute("weight",250);
-            image.setAttribute("tittle",character.name);
-
-            document.getElementById("container").append(image);
-        });
-    });
-
-/** 
-Futher suggestions:
-
-1) Replace XMLHttpRequest for Fetch, I think you'll learn a lot about promises by using it
-2) Create a separate class to handle the requests, as well as the rendering of the grid. Always keep in mind SRP (single responsability principle)
-3) Great work anyway! You're on the right track.
-
-PD: The API error seems to be related to the lack of an HTTP server, use the one I suggested on the email (I just tested it and it works here)
-*/
+new Request('https://rickandmortyapi.com/api/character/').handleAPI();
